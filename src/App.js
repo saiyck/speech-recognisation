@@ -1,25 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+import * as React from 'react';
+import Paper from '@mui/material/Paper';
+import InputBase from '@mui/material/InputBase';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import DirectionsIcon from '@mui/icons-material/Directions';
+import Box from '@mui/material/Box';
+import InputText from './InputText';
+import VoiceCreate from './VoiceCreate';
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Box flex={1} display={'flex'} height={'100vh'} justifyContent={'center'} alignItems={'center'}>
+     {/* <InputText/> */}
+     <VoiceCreate/>
+    </Box>
   );
 }
-
-export default App;
