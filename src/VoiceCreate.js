@@ -54,18 +54,14 @@ const VoiceCreate = () => {
       .stop()
       .getMp3()
       .then(([buffer, blob]) => {
-        console.log(blob)
         const blobURL = URL.createObjectURL(blob)
         const wavefile = new File([blob],'inhand.wav');
-        console.log(wavefile);
         handleUpload(wavefile).then((res)=>{
-            console.log('response',res);
-           setState({...state,value:res.data.text});
+           setState({...state,value:res.data.text,isRecording: false});
         }).catch((err)=> {
           console.log('errroorr',err);
         })
         setState({ ...state ,blobURL, isRecording: false });
-        console.log('blobURL',blobURL);
       }).catch((e) => console.log(e));
   };
 
