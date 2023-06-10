@@ -12,7 +12,6 @@ import { handleUpload } from "./Common";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
-console.log('renderrr')
 
 const VoiceCreate = () => {
     const [state, setState] = useState(
