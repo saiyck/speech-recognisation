@@ -9,6 +9,7 @@ import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
 
 import { handleUpload } from "./Common";
+import { Box } from "@mui/material";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
@@ -57,7 +58,7 @@ const VoiceCreate = () => {
         const blobURL = URL.createObjectURL(blob)
         const wavefile = new File([blob],'inhand.wav');
         handleUpload(wavefile).then((res)=>{
-           setState({...state,value:res.data.text,isRecording: false});
+           setState({...state,value:res.data.text,isRecording: false, blobURL});
         }).catch((err)=> {
           console.log('errroorr',err);
         })
@@ -67,15 +68,18 @@ const VoiceCreate = () => {
 
 
     return (
+    <Box>
         <Paper
         component="form"
-        sx={{ p: '4px 4px', display: 'flex', alignItems: 'center', width: 400 }}
+        sx={{ p: '4px 4px', display: 'flex', alignItems: 'center',width:'70vh'}}
       >
         <IconButton sx={{ p: '10px' }} aria-label="menu">
         </IconButton>
         <InputBase
           sx={{ ml: 1, flex: 1 }}
           placeholder="Search Google Maps"
+          multiline
+          maxRows={4}
           value={state.value}
           inputProps={{ 'aria-label': 'search google maps' }}
           onChange={(v) => setState({...state, value : v.target.value})}
@@ -88,6 +92,8 @@ const VoiceCreate = () => {
           <StopIcon sx={{color: state.isRecording ? 'red' : 'gray'}}/>
         </IconButton>
       </Paper>
+      {state.blobURL ?  <audio style={{marginTop:20}} src={state.blobURL} controls></audio> : null}
+      </Box>
     )
 }
 
