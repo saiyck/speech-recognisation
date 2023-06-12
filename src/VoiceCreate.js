@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useRef,useState,useEffect, useMemo } from "react";
 import ReactDOM from "react-dom/client";
 import MicRecorder from 'mic-recorder-to-mp3';
 import Paper from '@mui/material/Paper';
@@ -7,9 +7,10 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
+import {createFileName} from 'use-react-screenshot';
 
 import { handleUpload } from "./Common";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
@@ -24,18 +25,80 @@ const VoiceCreate = () => {
         }
     );
 
+    const videoRef = useRef(null);
+    const mediaRecorderRef = useRef(null);
+    const [screenshot, setScreenshot] = useState('');
+    var intervel;
+  
+
    useEffect(()=>{
-    navigator.getUserMedia({ audio: true },
-        () => {
-          console.log('Permission Granted');
-          setState({ ...state ,isBlocked: false });
-        },
-        () => {
-          console.log('Permission Denied');
-          this.setState({ ...state,isBlocked: true })
-        },
-      );
+     checkPermissions()
    },[]);
+
+
+   useEffect(()=> {
+    console.log('call useeffect')
+   },[])
+
+
+   const checkPermissions = () => {
+    navigator.getUserMedia({ audio: true },
+      () => {
+        console.log('Permission Granted');
+        setState({ ...state ,isBlocked: false });
+      },
+      () => {
+        console.log('Permission Denied');
+        this.setState({ ...state,isBlocked: true })
+      },
+    );
+    //handleStartCamera()
+   }
+
+
+   const handleStartCamera = async () => {
+    try {
+      const constraints = { video: { facingMode: 'user' } };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      videoRef.current.srcObject = stream;
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.start()
+      captureScreeShotEvery5Seconds()
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+    }
+  };
+
+
+  const captureScreeShotEvery5Seconds = () => {
+    intervel = setInterval(()=>{
+    handleCaptureScreenshot();
+    console.log('interval',intervel);
+    },5000)
+  }
+
+
+  const stopSubmit = () => {
+    clearInterval(intervel);
+    window.location.reload(true);
+  }
+
+
+  const handleCaptureScreenshot = () => {
+    let extension="jpg"
+    let name="screenshot"
+    const videoElement = videoRef.current;
+    const canvas = document.createElement('canvas');
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
+    canvas.getContext('2d').drawImage(videoElement, 0, 0);
+    const screenshotDataUrl = canvas.toDataURL('image/png');
+    const a = document.createElement("a");
+    a.href = screenshotDataUrl;
+    a.download = createFileName(extension, name);
+    a.click();
+    //setScreenshot(screenshotDataUrl);
+  };
 
 
   const start = () => {
@@ -68,6 +131,7 @@ const VoiceCreate = () => {
 
 
     return (
+      <>
     <Box>
         <Paper
         component="form"
@@ -93,11 +157,17 @@ const VoiceCreate = () => {
         </IconButton>
       </Paper>
       {state.blobURL ?  <audio style={{marginTop:20}} src={state.blobURL} controls></audio> : null}
+      <div style={{marginTop:20}}>
+      <button onClick={handleStartCamera}>Start Camera</button>
+      <video style={{display:'none'}} ref={videoRef} autoPlay />
+      <button style={{marginLeft:20}} onClick={stopSubmit}>Stop Screenshot</button>
+    </div>
       </Box>
+       </>
     )
 }
 
-export default VoiceCreate;
+export default React.memo(VoiceCreate);
 
 
 

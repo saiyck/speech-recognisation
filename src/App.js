@@ -9,11 +9,11 @@ import DirectionsIcon from '@mui/icons-material/Directions';
 import Box from '@mui/material/Box';
 import InputText from './InputText';
 import VoiceCreate from './VoiceCreate';
+import CameraComponent from './CameraComponent';
 
 export default function App() {
   return (
     <Box flex={1} display={'flex'} height={'100vh'} justifyContent={'center'} alignItems={'center'}>
-     {/* <InputText/> */}
      <VoiceCreate/>
     </Box>
   );
