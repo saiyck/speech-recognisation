@@ -27,8 +27,10 @@ const VoiceCreate = () => {
 
     const videoRef = useRef(null);
     const mediaRecorderRef = useRef(null);
-    const [screenshot, setScreenshot] = useState('');
-    var intervel;
+    const [streame,setStreame]=useState(null);
+    const [screenshot, setScreenshot] = useState([]);
+    const [interival,setInterival] = useState(0);
+    var temp = [];
   
 
    useEffect(()=>{
@@ -63,6 +65,7 @@ const VoiceCreate = () => {
       videoRef.current.srcObject = stream;
       mediaRecorderRef.current = new MediaRecorder(stream);
       mediaRecorderRef.current.start()
+      setStreame(stream)
       captureScreeShotEvery5Seconds()
     } catch (error) {
       console.error('Error accessing camera:', error);
@@ -71,16 +74,17 @@ const VoiceCreate = () => {
 
 
   const captureScreeShotEvery5Seconds = () => {
-    intervel = setInterval(()=>{
+   let intervel = setInterval(()=>{
     handleCaptureScreenshot();
-    console.log('interval',intervel);
+    setInterival(intervel)
     },5000)
   }
 
 
-  const stopSubmit = () => {
-    clearInterval(intervel);
-    window.location.reload(true);
+  const stopSubmit = async () => {
+    streame.getVideoTracks()[0].stop();
+    console.log('media',interival);
+    clearInterval(interival);
   }
 
 
@@ -93,15 +97,18 @@ const VoiceCreate = () => {
     canvas.height = videoElement.videoHeight;
     canvas.getContext('2d').drawImage(videoElement, 0, 0);
     const screenshotDataUrl = canvas.toDataURL('image/png');
-    const a = document.createElement("a");
-    a.href = screenshotDataUrl;
-    a.download = createFileName(extension, name);
-    a.click();
+    // const a = document.createElement("a");
+    // a.href = screenshotDataUrl;
+    // a.download = createFileName(extension, name);
+    // a.click();
+    temp.push(screenshotDataUrl);
+    setScreenshot([...temp]);
     //setScreenshot(screenshotDataUrl);
   };
 
 
   const start = () => {
+    handleStartCamera()
     if (state.isBlocked) {
       console.log('Permission Denied');
     } else {
@@ -127,6 +134,7 @@ const VoiceCreate = () => {
         })
         setState({ ...state ,blobURL, isRecording: false });
       }).catch((e) => console.log(e));
+      stopSubmit()
   };
 
 
@@ -157,11 +165,18 @@ const VoiceCreate = () => {
         </IconButton>
       </Paper>
       {state.blobURL ?  <audio style={{marginTop:20}} src={state.blobURL} controls></audio> : null}
-      <div style={{marginTop:20}}>
-      <button onClick={handleStartCamera}>Start Camera</button>
       <video style={{display:'none'}} ref={videoRef} autoPlay />
-      <button style={{marginLeft:20}} onClick={stopSubmit}>Stop Screenshot</button>
-    </div>
+      {screenshot.length > 0 && !state.isRecording ? 
+      <div style={{display:'flex',marginTop:20}}>
+      {
+        screenshot.map((item)=> {
+          return(
+            <img src={item} style={{width:100,height:100,marginLeft:20}} alt="Screenshot" />
+          )
+        })
+      }
+    </div> : null
+    }
       </Box>
        </>
     )
