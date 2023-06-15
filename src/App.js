@@ -13,7 +13,7 @@ import CameraComponent from './CameraComponent';
 
 export default function App() {
   return (
-    <Box flex={1} display={'flex'} height={'100vh'} justifyContent={'center'} alignItems={'center'}>
+    <Box flex={1} sx={{backgroundColor:'#F5F5F5'}} display={'flex'} height={'100vh'} justifyContent={'center'} alignItems={'center'}>
      <VoiceCreate/>
     </Box>
   );
