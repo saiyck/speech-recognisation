@@ -10,11 +10,12 @@ import Box from '@mui/material/Box';
 import InputText from './InputText';
 import VoiceCreate from './VoiceCreate';
 import CameraComponent from './CameraComponent';
+import Grid from '@mui/material/Grid';
 
 export default function App() {
   return (
-    <Box flex={1} sx={{backgroundColor:'#F5F5F5'}} display={'flex'} height={'100vh'} justifyContent={'center'} alignItems={'center'}>
+    <Grid xs={12} flex={1} sx={{backgroundColor:'#F5F5F5'}}>
      <VoiceCreate/>
-    </Box>
+    </Grid>
   );
 }

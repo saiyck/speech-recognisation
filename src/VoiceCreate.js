@@ -23,7 +23,7 @@ const VoiceCreate = () => {
             blobURL: '',
             isBlocked: false,
             value : '',
-            skills:''
+            promptInfo:''
         }
     );
     const [data,setData] = useState([]);
@@ -36,13 +36,13 @@ const VoiceCreate = () => {
     const [question,setQuestion] = useState("Hello Whats your name?");
     var temp = [];
     var messages = [];
-    const promptInfo = `
-you are an interviewer. 
-the candidate is a ${state.skills}. based on the candidates proficiency, ask interview questions. based on the candidate's response, either choose to ask a follow up question or move on to a new question. end the interview when you feel like you have covered enough.
+//     const promptInfo = `
+// you are an interviewer. 
+// the candidate is a ${state.skills}. based on the candidates proficiency, ask interview questions. based on the candidate's response, either choose to ask a follow up question or move on to a new question. end the interview when you feel like you have covered enough.
 
-1) ask only a single question in each response. 
-2) if user has responded to you before, choose whether to ask a followup question or ask a new one.
-`
+// 1) ask only a single question in each response. 
+// 2) if user has responded to you before, choose whether to ask a followup question or ask a new one.
+// `
   
 
    useEffect(()=>{
@@ -115,8 +115,9 @@ the candidate is a ${state.skills}. based on the candidates proficiency, ask int
 
 
   const start = () => {
-    if(state.skills == ''){
-      window.alert("please add skills")
+    if(state.promptInfo == ''){
+      window.alert("please add promptInfo")
+      return
     }
     // handleStartCamera()
     if (state.isBlocked) {
@@ -132,7 +133,7 @@ the candidate is a ${state.skills}. based on the candidates proficiency, ask int
 
   React.useEffect(()=>{
     if(state.value != ''){
-      handleUploadAnswers(data,promptInfo).then((res)=>{
+      handleUploadAnswers(data,state.promptInfo).then((res)=>{
         console.log('res',res);
         let ms  = {role: "assistant", content: res?.data.choices[0]?.message?.content}
         let temp = [...data];
@@ -165,28 +166,24 @@ the candidate is a ${state.skills}. based on the candidates proficiency, ask int
 
 
     return (
-      <>
-    <Box>
+       <Box sx={{display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',paddingTop:10}}>
         <Paper
-        component="form"
-        sx={{ p: '4px 4px', display: 'flex', alignItems: 'center',width:'50vh',marginBottom:5}}
+        sx={{ p: '10px 10px',marginBottom:5,maxWidth:'60vh'}}
       >
-        <IconButton sx={{ p: '10px' }} aria-label="menu">
-        </IconButton>
         <InputBase
-          sx={{ ml: 1, flex: 1 }}
-          placeholder="Add Interview skills here Ex: beginner in python and intermediate developer in nodejs and reactnative"
+          sx={{ ml: 1,width:'60vh'}}
+          placeholder="Add prompt Message here"
           multiline
           maxRows={4}
           value={state.skills}
           inputProps={{ 'aria-label': 'search google maps' }}
-          onChange={(v) => setState({...state, skills : v.target.value})}
+          onChange={(v) => setState({...state, promptInfo : v.target.value})}
         />
       </Paper>
       {/* {state.blobURL ?  <audio style={{marginTop:20}} src={state.blobURL} controls></audio> : null} */}
-      <video style={{display:'none'}} ref={videoRef} autoPlay />
-      {screenshot.length > 0 && !state.isRecording ? 
-      <div style={{display:'flex',marginTop:20}}>
+      {/* <video style={{display:'none'}} ref={videoRef} autoPlay /> */}
+      {/* {screenshot.length > 0 && !state.isRecording ? 
+      <div style={{display:'flex',marginTop:20}}> */}
       {/* {
         screenshot.map((item)=> {
           return(
@@ -194,16 +191,16 @@ the candidate is a ${state.skills}. based on the candidates proficiency, ask int
           )
         })
       } */}
-    </div> : null
-    }
+    {/* </div> : null
+    } */}
      <QuestionCard onChangeValue={(v)=> setState({...state, value : v.target.value})} text={state.value} onSubmit={()=> stop()} onMicPress={()=> start()} title={question} isRecording={state.isRecording}/>
+      
       <Box sx={{textAlign:'center',marginTop:'20px'}}>
         <Typography color={'gray'}>
           Timer: 00:00
         </Typography>
       </Box>
       </Box>
-       </>
     )
 }
 

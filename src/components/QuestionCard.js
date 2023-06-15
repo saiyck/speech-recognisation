@@ -12,8 +12,8 @@ import MicIcon from '@mui/icons-material/Mic';
 export default function QuestionCard(props) {
   const {title,onMicPress,onSubmit,isRecording,text,onChangeValue} = props;
   return (
-   <Card sx={{textAlign:'center'}}>
-     <CardContent sx={{width:'70vh'}}>
+   <Card sx={{textAlign:'center',maxWidth:'60vh'}}>
+     <CardContent>
      <Typography sx={{ fontSize: 18, fontWeight:'bold',color:'#000' }} color="text.secondary" gutterBottom>
          {title}
         </Typography>
