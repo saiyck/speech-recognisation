@@ -9,12 +9,14 @@ import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
 import {createFileName} from 'use-react-screenshot';
 
-import { handleUpload, handleUploadAnswers } from "./Common";
+import { handleUpload, handleUploadAnswers, retrivePromptMessage } from "./Common";
 import { Alert, Box, Typography } from "@mui/material";
 import QuestionCard from "./components/QuestionCard";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
+  const queryParameters = new URLSearchParams(window.location.search)
+  const id = queryParameters.get("id")
 
 const VoiceCreate = () => {
     const [state, setState] = useState(
@@ -51,8 +53,13 @@ const VoiceCreate = () => {
 
 
    useEffect(()=> {
-    console.log('call useeffect')
+      retrivePromptMessage(id).then((res)=>{
+       setState({...state,promptInfo: res.promptMessage})
+      }).catch((err)=>{
+        console.log('error:',err);
+      })
    },[])
+
 
 
    const checkPermissions = () => {
@@ -134,12 +141,11 @@ const VoiceCreate = () => {
   React.useEffect(()=>{
     if(state.value != ''){
       handleUploadAnswers(data,state.promptInfo).then((res)=>{
-        console.log('res',res);
-        let ms  = {role: "assistant", content: res?.data.choices[0]?.message?.content}
+        let ms  = {role: "assistant", content: res.message}
         let temp = [...data];
        temp.push(ms);
        setData(temp);
-       setQuestion(res?.data.choices[0]?.message?.content);
+       setQuestion(res.message);
     }).catch((err)=> {
       console.log('errroorr',err);
     })
@@ -154,11 +160,11 @@ const VoiceCreate = () => {
         const blobURL = URL.createObjectURL(blob)
         const wavefile = new File([blob],'inhand.wav');
         handleUpload(wavefile).then((res)=>{
-          let m  = {role: "user", content: res.data.text}
+          let m  = {role: "user", content: res.data.message}
           let temp = [...data];
           temp.push(m);
           setData(temp);
-           setState({...state,value:res.data.text,isRecording: false, blobURL});   
+          setState({...state,value:res.data.message,isRecording: false, blobURL});   
       }).catch((e) => console.log(e));
       // stopSubmit()
     })    
@@ -175,7 +181,7 @@ const VoiceCreate = () => {
           placeholder="Add prompt Message here"
           multiline
           maxRows={4}
-          value={state.skills}
+          value={state.promptInfo}
           inputProps={{ 'aria-label': 'search google maps' }}
           onChange={(v) => setState({...state, promptInfo : v.target.value})}
         />
