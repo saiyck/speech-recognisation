@@ -3,48 +3,64 @@ import ReactDOM from "react-dom/client";
 import MicRecorder from 'mic-recorder-to-mp3';
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MicIcon from '@mui/icons-material/Mic';
-import StopIcon from '@mui/icons-material/Stop';
-import {createFileName} from 'use-react-screenshot';
-
-import { handleUpload, handleUploadAnswers, retrivePromptMessage } from "./Common";
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useParams } from 'react-router-dom';
+import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
+import TextField from '@mui/material/TextField';
+import { handleUpload, handleUploadAnswers, retrivePromptMessage, updateEmailId } from "./Common";
 import { Alert, Box, Typography } from "@mui/material";
 import QuestionCard from "./components/QuestionCard";
 
+
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
-  const queryParameters = new URLSearchParams(window.location.search)
-  const id = queryParameters.get("id")
+  // const queryParameters = new URLSearchParams(window.location.search)
+ 
 
-const VoiceCreate = () => {
+
+const VoiceCreate = (props) => {
     const [state, setState] = useState(
         {
             isRecording: false,
             blobURL: '',
             isBlocked: false,
             value : '',
-            promptInfo:''
         }
     );
+    const [promptInfo,setPromptInfo] = useState('');
+    const [loading,setLoading] = useState(false);
+    const [emailPopup,setEmailPopup] = useState(false);
     const [data,setData] = useState([]);
-
+    const [open, setOpen] = React.useState(false);
+    const [openM, setOpenM] = React.useState(false);
     const videoRef = useRef(null);
     const mediaRecorderRef = useRef(null);
     const [streame,setStreame]=useState(null);
     const [screenshot, setScreenshot] = useState([]);
     const [interival,setInterival] = useState(0);
+    const [email,setEmail] = useState('');
     const [question,setQuestion] = useState("Hello Whats your name?");
     var temp = [];
     var messages = [];
-//     const promptInfo = `
-// you are an interviewer. 
-// the candidate is a ${state.skills}. based on the candidates proficiency, ask interview questions. based on the candidate's response, either choose to ask a follow up question or move on to a new question. end the interview when you feel like you have covered enough.
+    const params = useParams();
+    const id = params.id;
 
-// 1) ask only a single question in each response. 
-// 2) if user has responded to you before, choose whether to ask a followup question or ask a new one.
-// `
+
+    const style = {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 400,
+      bgcolor: 'background.paper',
+      border: '2px solid #000',
+      boxShadow: 24,
+      p: 4,
+    };
+    
+
   
 
    useEffect(()=>{
@@ -53,12 +69,26 @@ const VoiceCreate = () => {
 
 
    useEffect(()=> {
+     handleOpen()
       retrivePromptMessage(id).then((res)=>{
-       setState({...state,promptInfo: res.promptMessage})
+        if(!res.userId){
+          setOpenM(true);
+        }
+        setPromptInfo(res.promptMessage);
+       handleClose()
       }).catch((err)=>{
         console.log('error:',err);
+        handleClose()
       })
    },[])
+
+
+   const handleClose = () => {
+    setOpen(false);
+  };
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
 
 
@@ -74,6 +104,19 @@ const VoiceCreate = () => {
       },
     );
     //handleStartCamera()
+   }
+
+   const handleSubmitEmailId = () => {
+       handleOpen()
+       updateEmailId(id,email).then((res)=>{
+         if(res.userId){
+           setOpenM(false);
+         }
+         handleClose()
+       }).catch((err)=>{
+        console.log('errorUpdateEmail:',err)
+        handleClose()
+       })
    }
 
 
@@ -122,7 +165,7 @@ const VoiceCreate = () => {
 
 
   const start = () => {
-    if(state.promptInfo == ''){
+    if(promptInfo == ''){
       window.alert("please add promptInfo")
       return
     }
@@ -140,12 +183,15 @@ const VoiceCreate = () => {
 
   React.useEffect(()=>{
     if(state.value != ''){
-      handleUploadAnswers(data,state.promptInfo).then((res)=>{
+      handleUploadAnswers(data,promptInfo,id).then((res)=>{
         let ms  = {role: "assistant", content: res.message}
         let temp = [...data];
        temp.push(ms);
        setData(temp);
        setQuestion(res.message);
+       setTimeout(()=>{
+        setLoading(false)
+      },1000);
     }).catch((err)=> {
       console.log('errroorr',err);
     })
@@ -159,12 +205,13 @@ const VoiceCreate = () => {
       .then(([buffer, blob]) => {
         const blobURL = URL.createObjectURL(blob)
         const wavefile = new File([blob],'inhand.wav');
+        setLoading(true)
         handleUpload(wavefile).then((res)=>{
           let m  = {role: "user", content: res.data.message}
           let temp = [...data];
           temp.push(m);
           setData(temp);
-          setState({...state,value:res.data.message,isRecording: false, blobURL});   
+          setState({...state,value:res.data.message,isRecording: false, blobURL});
       }).catch((e) => console.log(e));
       // stopSubmit()
     })    
@@ -172,6 +219,7 @@ const VoiceCreate = () => {
 
 
     return (
+      <>
        <Box sx={{display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',paddingTop:10}}>
         <Paper
         sx={{ p: '10px 10px',marginBottom:5,maxWidth:'60vh'}}
@@ -181,9 +229,9 @@ const VoiceCreate = () => {
           placeholder="Add prompt Message here"
           multiline
           maxRows={4}
-          value={state.promptInfo}
+          value={promptInfo}
           inputProps={{ 'aria-label': 'search google maps' }}
-          onChange={(v) => setState({...state, promptInfo : v.target.value})}
+          onChange={(v) => setPromptInfo(v.target.value)}
         />
       </Paper>
       {/* {state.blobURL ?  <audio style={{marginTop:20}} src={state.blobURL} controls></audio> : null} */}
@@ -199,7 +247,7 @@ const VoiceCreate = () => {
       } */}
     {/* </div> : null
     } */}
-     <QuestionCard onChangeValue={(v)=> setState({...state, value : v.target.value})} text={state.value} onSubmit={()=> stop()} onMicPress={()=> start()} title={question} isRecording={state.isRecording}/>
+     <QuestionCard isLoading={loading} onChangeValue={(v)=> setState({...state, value : v.target.value})} text={state.value} onSubmit={()=> stop()} onMicPress={()=> start()} title={question} isRecording={state.isRecording}/>
       
       <Box sx={{textAlign:'center',marginTop:'20px'}}>
         <Typography color={'gray'}>
@@ -207,6 +255,31 @@ const VoiceCreate = () => {
         </Typography>
       </Box>
       </Box>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={open}
+        onClick={handleClose}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      <Modal
+        open={openM}
+        onClose={()=>{}}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Please enter your email id
+          </Typography>
+          <TextField onChange={(e)=> setEmail(e.target.value)} sx={{width:'100%',mt:3}} id="outlined-basic" label="Email" variant="outlined" />
+          <Button onClick={handleSubmitEmailId} sx={{mt:2}} variant="contained">
+            {open ? <CircularProgress color="inherit" /> : 'Submit'}
+            </Button>
+        </Box>
+      </Modal>
+      </>
     )
 }
 

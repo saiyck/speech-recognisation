@@ -1,6 +1,7 @@
 import axios from "axios";
 const {REACT_APP_API_URL} = process.env;
 console.log(REACT_APP_API_URL);
+
 export const handleUpload = (newfiles) => {
     let formData = new FormData();
     formData.append("file", newfiles);
@@ -34,11 +35,16 @@ export const retrivePromptMessage = (id) => {
 }   
 
 
-export const handleUploadAnswers = (messages,promptInfo) => {
-    console.log("messages",messages);
+export const handleUploadAnswers = (messages,promptInfo,id) => {
+    console.log("messages",{
+        systemPrompt: promptInfo,
+        messages:[
+             ...messages
+        ]
+    });
     return new Promise((resolve,reject)=> {
         axios({
-            url:`${REACT_APP_API_URL}/createChatCompletion`,
+            url:`${REACT_APP_API_URL}/createChatCompletion/${id}`,
             method:'POST',
             data: {
                 systemPrompt: promptInfo,
@@ -47,9 +53,29 @@ export const handleUploadAnswers = (messages,promptInfo) => {
                 ]
             }
         }).then((res)=> {
+            console.log('ress',res)
+            resolve(res.data)
+        }).catch((err)=>{
+            console.log('errr',err)
+            reject(err)
+        })
+    })
+}
+
+export const updateEmailId = (userId,email) => {
+    console.log("Id",userId);
+    return new Promise((resolve,reject)=> {
+        axios({
+            url:`${REACT_APP_API_URL}/updateEmail/${userId}`,
+            method:'PUT',
+            data: {
+               email
+            }
+        }).then((res)=> {
             resolve(res.data)
         }).catch((err)=>{
             reject(err)
         })
     })
-}   
+}
+
