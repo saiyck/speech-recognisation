@@ -41,6 +41,8 @@ const VoiceCreate = (props) => {
     const [screenshot, setScreenshot] = useState([]);
     const [interival,setInterival] = useState(0);
     const [email,setEmail] = useState('');
+    const [showCode,setShowCode] = useState(false);
+    const [example,setExample] = useState('');
     const [question,setQuestion] = useState("Hello Whats your name?");
     var temp = [];
     var messages = [];
@@ -181,9 +183,23 @@ const VoiceCreate = (props) => {
     }
   };
 
+  function is_asking_for_code(response){
+   const code_keywords = ["write code","write a code","provide code", "show code", "example code", "code snippet","provide an example"]
+    response = response.toLowerCase();
+
+    for (const keyword of code_keywords){
+        if (response.includes(keyword)){
+            return true  
+        }
+    }
+     return false
+}
+
   React.useEffect(()=>{
     if(state.value != ''){
       handleUploadAnswers(data,promptInfo,id).then((res)=>{
+        const result = is_asking_for_code(res.message);
+        setShowCode(result);
         let ms  = {role: "assistant", content: res.message}
         let temp = [...data];
        temp.push(ms);
@@ -199,6 +215,7 @@ const VoiceCreate = (props) => {
   },[state.value])
 
  const stop = () => {
+  if(example == '' && !showCode){
     Mp3Recorder
       .stop()
       .getMp3()
@@ -215,6 +232,14 @@ const VoiceCreate = (props) => {
       }).catch((e) => console.log(e));
       // stopSubmit()
     })    
+  }else{
+    let m  = {role: "user", content: example}
+          let temp = [...data];
+          temp.push(m);
+          setData(temp);
+          setState({...state,value: example,isRecording: false});
+          setExample('');
+  }
   };
 
 
@@ -234,6 +259,22 @@ const VoiceCreate = (props) => {
           onChange={(v) => setPromptInfo(v.target.value)}
         />
       </Paper>
+     
+      {showCode ? 
+      <Paper
+        sx={{ p: '10px 10px',marginBottom:5,maxWidth:'60vh',height:'40vh'}}
+      >
+        <InputBase
+        sx={{ ml: 1,width:'60vh'}}
+        placeholder="Please write the code."
+        multiline
+        maxRows={5}
+        value={example}
+        inputProps={{ 'aria-label': 'write the code' }}
+        onChange={(v) => setExample(v.target.value)}
+      />  
+      </Paper> : null
+        }
       {/* {state.blobURL ?  <audio style={{marginTop:20}} src={state.blobURL} controls></audio> : null} */}
       {/* <video style={{display:'none'}} ref={videoRef} autoPlay /> */}
       {/* {screenshot.length > 0 && !state.isRecording ? 
