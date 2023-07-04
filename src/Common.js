@@ -73,16 +73,13 @@ export const checkTheStatus = (prompt) => {
 
 
 export const handleUploadAnswers = (messages,promptInfo,id) => {
-    console.log("messages",{
-        systemPrompt: promptInfo,
-        messages:[
-             ...messages
-        ]
-    });
     return new Promise((resolve,reject)=> {
         axios({
             url:`${REACT_APP_API_URL}/createChatCompletion/${id}`,
             method:'POST',
+            headers:{
+                "Acess-Control-Allow-Origin": true  
+            },
             data: {
                 systemPrompt: promptInfo,
                 messages:[

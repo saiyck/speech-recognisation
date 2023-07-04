@@ -29,12 +29,13 @@ const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 const VoiceCreate = (props) => {
   const [state, setState] = useState(
     {
-      isRecording: false,
-      blobURL: '',
-      isBlocked: false,
       value: '',
     }
   );
+  const [isRecording, setIsRecording] = useState(false);
+  const [blobURL,setblobURL] = useState('');
+  const [isBlocked,setIsBlocked] = useState(false);
+  const [value,setValue] = useState('');
   const [promptInfo, setPromptInfo] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailPopup, setEmailPopup] = useState(false);
@@ -48,7 +49,7 @@ const VoiceCreate = (props) => {
   const [interival, setInterival] = useState(0);
   const [email, setEmail] = useState('');
   const [showCode, setShowCode] = useState(false);
-  const [example, setExample] = useState('hello');
+  const [example, setExample] = useState('');
   const [question, setQuestion] = useState("Hello Whats your name?");
   var temp = [];
   var messages = [];
@@ -104,11 +105,11 @@ const VoiceCreate = (props) => {
     navigator.getUserMedia({ audio: true },
       () => {
         console.log('Permission Granted');
-        setState({ ...state, isBlocked: false });
+        setIsBlocked(false)
       },
       () => {
         console.log('Permission Denied');
-        this.setState({ ...state, isBlocked: true })
+        setIsBlocked(true)
       },
     );
     //handleStartCamera()
@@ -178,41 +179,29 @@ const VoiceCreate = (props) => {
       return
     }
     // handleStartCamera()
-    if (state.isBlocked) {
+    if (isBlocked) {
       console.log('Permission Denied');
     } else {
       Mp3Recorder
         .start()
         .then(() => {
-          setState({ ...state, isRecording: true });
+          setIsRecording(true)
         }).catch((e) => console.error(e));
     }
   };
 
-  function is_asking_for_code(response) {
-    const code_keywords = ["write code", "write a code", "provide code", "show code", "example code", "code snippet", "provide an example"]
-    response = response.toLowerCase();
 
-    for (const keyword of code_keywords) {
-      if (response.includes(keyword)) {
-        return true
-      }
-    }
-    return false
-  }
 
   React.useEffect(() => {
-    if (state.value != '') {
+    if (value != '') {
       handleUploadAnswers(data, promptInfo, id).then((res) => {
         checkTheStatus(res.message).then((res) => {
           console.log('ress', res);
           let cdata = res.data.choices[0];
           if (cdata.finish_reason == "function_call") {
             setShowCode(true)
-            setState({...state,isRecording:true})
           } else {
             setShowCode(false)
-            setState({...state,isRecording:false})
           }
         }).catch((err) => {
           console.log('errr', err);
@@ -222,14 +211,14 @@ const VoiceCreate = (props) => {
           temp.push(ms);
           setData(temp);
           setQuestion(res.message);
-          setTimeout(() => {
-            setLoading(false)
-          }, 1000);
+          setLoading(false)
       }).catch((err) => {
         console.log('errroorr', err);
       })
     }
-  }, [state.value])
+  }, [value])
+
+
 
   const stop = () => {
     if (example == '' && !showCode) {
@@ -245,7 +234,9 @@ const VoiceCreate = (props) => {
             let temp = [...data];
             temp.push(m);
             setData(temp);
-            setState({ ...state, value: res.data.message, isRecording: false, blobURL });
+            setblobURL(blobURL)
+            setValue(res.data.message)
+            setIsRecording(false);
           }).catch((e) => console.log(e));
           // stopSubmit()
         })
@@ -254,7 +245,8 @@ const VoiceCreate = (props) => {
       let temp = [...data];
       temp.push(m);
       setData(temp);
-      setState({ ...state, value: example, isRecording: false });
+      setValue(example);
+      setIsRecording(false);
       setExample('');
     }
   };
@@ -321,7 +313,7 @@ const VoiceCreate = (props) => {
       } */}
         {/* </div> : null
     } */}
-        <QuestionCard isLoading={loading} onChangeValue={(v) => setState({ ...state, value: v.target.value })} text={state.value} onSubmit={() => stop()} onMicPress={() => start()} title={question} isRecording={state.isRecording} />
+        <QuestionCard isLoading={loading} onChangeValue={(v) => setValue(v.target.value)} text={value} onSubmit={() => stop()} onMicPress={() => start()} title={question} isRecording={isRecording} />
 
         <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
           <Typography color={'gray'}>
