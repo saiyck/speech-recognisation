@@ -1,0 +1,15 @@
+.react-simple-code-editor:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+.react-simple-code-editor input:focus {
+    outline: none;
+    border-color: transparent;
+    box-shadow: none;
+  }  
+
+.editor{
+    outline: none;
+    box-shadow: none;
+}
