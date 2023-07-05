@@ -196,7 +196,6 @@ const VoiceCreate = (props) => {
     if (value != '') {
       handleUploadAnswers(data, promptInfo, id).then((res) => {
         checkTheStatus(res.message).then((res) => {
-          console.log('ress', res);
           let cdata = res.data.choices[0];
           if (cdata.finish_reason == "function_call") {
             setShowCode(true)
@@ -205,6 +204,7 @@ const VoiceCreate = (props) => {
           }
         }).catch((err) => {
           console.log('errr', err);
+           setShowCode(false)
         })
         let ms = { role: "assistant", content: res.message }
           let temp = [...data];
@@ -221,7 +221,7 @@ const VoiceCreate = (props) => {
 
 
   const stop = () => {
-    if (example == '' && !showCode) {
+    if (!showCode) {
       Mp3Recorder
         .stop()
         .getMp3()
@@ -273,15 +273,6 @@ const VoiceCreate = (props) => {
           <Paper
             sx={{ p: '10px 10px', marginBottom: 5, maxWidth: '60vh' }}
           >
-            {/* <InputBase
-        sx={{ ml: 1,width:'60vh'}}
-        placeholder="Please write the code."
-        multiline
-        maxRows={5}
-        value={example}
-        inputProps={{ 'aria-label': 'write the code' }}
-        onChange={(v) => setExample(v.target.value)}
-      />   */}
             <Editor
               // className="editor"
               value={example}
@@ -298,6 +289,7 @@ const VoiceCreate = (props) => {
                 overflow: 'auto',
               }}
             />
+            <Button onClick={stop} size='small' variant="contained">Submit</Button>
           </Paper> : null
         }
         {/* {state.blobURL ?  <audio style={{marginTop:20}} src={state.blobURL} controls></audio> : null} */}
