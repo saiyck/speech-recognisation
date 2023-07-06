@@ -72,9 +72,9 @@ const VoiceCreate = (props) => {
 
 
 
-  useEffect(() => {
-    checkPermissions()
-  }, []);
+  // useEffect(() => {
+  //   checkPermissions()
+  // }, []);
 
 
   useEffect(() => {
@@ -101,19 +101,19 @@ const VoiceCreate = (props) => {
 
 
 
-  const checkPermissions = () => {
-    navigator.getUserMedia({ audio: true },
-      () => {
-        console.log('Permission Granted');
-        setIsBlocked(false)
-      },
-      () => {
-        console.log('Permission Denied');
-        setIsBlocked(true)
-      },
-    );
-    //handleStartCamera()
-  }
+  // const checkPermissions = () => {
+  //   navigator.getUserMedia({ audio: true },
+  //     () => {
+  //       console.log('Permission Granted');
+  //       setIsBlocked(false)
+  //     },
+  //     () => {
+  //       console.log('Permission Denied');
+  //       setIsBlocked(true)
+  //     },
+  //   );
+  //   handleStartCamera()
+  // }
 
   const handleSubmitEmailId = () => {
     handleOpen()
