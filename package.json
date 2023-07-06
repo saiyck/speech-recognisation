@@ -1,5 +1,6 @@
 {
   "name": "speach-recognisation",
+  "proxy":"http://localhost:3000/riktam/openapi/v1",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

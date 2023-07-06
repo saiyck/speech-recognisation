@@ -7,7 +7,7 @@ export const handleUpload = (newfiles) => {
     formData.append("file", newfiles);
     return new Promise((resolve,reject)=> {
         axios({
-            url:`${REACT_APP_API_URL}/createtransaction`,
+            url:`/createtransaction`,
             method:'POST',
             data: formData
         }).then((res)=> {
@@ -22,7 +22,7 @@ export const handleUpload = (newfiles) => {
 export const retrivePromptMessage = (id) => {
    return new Promise((resolve,reject)=> {
      axios({
-        url:`${REACT_APP_API_URL}/getPromptMessage/${id}`,
+        url:`/getPromptMessage/${id}`,
         method:'GET'
      }).then((res)=>{
         console.log('reee',res)
@@ -75,7 +75,7 @@ export const checkTheStatus = (prompt) => {
 export const handleUploadAnswers = (messages,promptInfo,id) => {
     return new Promise((resolve,reject)=> {
         axios({
-            url:`${REACT_APP_API_URL}/createChatCompletion/${id}`,
+            url:`/createChatCompletion/${id}`,
             method:'POST',
             headers:{
                 "Acess-Control-Allow-Origin": true  
@@ -98,7 +98,7 @@ export const updateEmailId = (userId,email) => {
     console.log("Id",userId);
     return new Promise((resolve,reject)=> {
         axios({
-            url:`${REACT_APP_API_URL}/updateEmail/${userId}`,
+            url:`/updateEmail/${userId}`,
             method:'PUT',
             data: {
                email
