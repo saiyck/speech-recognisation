@@ -82,9 +82,7 @@ export const handleUploadAnswers = (messages,promptInfo,id) => {
             },
             data: {
                 systemPrompt: promptInfo,
-                messages:[
-                     ...messages
-                ]
+                messages:messages.slice(-2)
             }
         }).then((res)=> {
             console.log('ress',res)

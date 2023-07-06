@@ -241,13 +241,14 @@ const VoiceCreate = (props) => {
           // stopSubmit()
         })
     } else {
+      setLoading(true)
       let m = { role: "user", content: example }
       let temp = [...data];
       temp.push(m);
       setData(temp);
       setValue(example);
       setIsRecording(false);
-      setExample('');
+      setShowCode(false)
     }
   };
 
