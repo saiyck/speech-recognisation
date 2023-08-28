@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
-import ReactDOM from "react-dom/client";
 import MicRecorder from 'mic-recorder-to-mp3';
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
@@ -27,15 +26,10 @@ const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
 
 const VoiceCreate = (props) => {
-  const [state, setState] = useState(
-    {
-      value: '',
-    }
-  );
   const [isRecording, setIsRecording] = useState(false);
-  const [blobURL,setblobURL] = useState('');
-  const [isBlocked,setIsBlocked] = useState(false);
-  const [value,setValue] = useState('');
+  const [blobURL, setblobURL] = useState('');
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [value, setValue] = useState('');
   const [promptInfo, setPromptInfo] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailPopup, setEmailPopup] = useState(false);
@@ -52,7 +46,6 @@ const VoiceCreate = (props) => {
   const [example, setExample] = useState('');
   const [question, setQuestion] = useState("Hello Whats your name?");
   var temp = [];
-  var messages = [];
   const params = useParams();
   const id = params.id;
 
@@ -112,7 +105,7 @@ const VoiceCreate = (props) => {
         setIsBlocked(true)
       },
     );
-    handleStartCamera()
+    //handleStartCamera()
   }
 
   const handleSubmitEmailId = () => {
@@ -204,14 +197,14 @@ const VoiceCreate = (props) => {
           }
         }).catch((err) => {
           console.log('errr', err);
-           setShowCode(false)
+          setShowCode(false)
         })
         let ms = { role: "assistant", content: res.message }
-          let temp = [...data];
-          temp.push(ms);
-          setData(temp);
-          setQuestion(res.message);
-          setLoading(false)
+        let temp = [...data];
+        temp.push(ms);
+        setData(temp);
+        setQuestion(res.message);
+        setLoading(false)
       }).catch((err) => {
         console.log('errroorr', err);
       })
@@ -254,7 +247,7 @@ const VoiceCreate = (props) => {
 
 
   return (
-    <>
+    <div>
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', paddingTop: 10 }}>
         <Paper
           sx={{ p: '10px 10px', marginBottom: 5, maxWidth: '60vh' }}
@@ -338,7 +331,7 @@ const VoiceCreate = (props) => {
           </Button>
         </Box>
       </Modal>
-    </>
+    </div>
   )
 }
 
